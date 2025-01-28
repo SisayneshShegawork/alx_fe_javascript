@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dynamic Quote Generator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 20px;
+    }
+    #quoteDisplay {
+      margin: 20px 0;
+      font-size: 1.5em;
+      font-weight: bold;
+    }
+    form {
+      margin: 20px 0;
+    }
+    input {
+      margin: 5px;
+      padding: 10px;
+      font-size: 1em;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 1em;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>Dynamic Quote Generator</h1>
+  <div id="quoteDisplay">Click "Show New Quote" to begin!</div>
+  <button id="newQuote">Show New Quote</button>
+
+  <form id="addQuoteForm">
+    <input id="newQuoteText" type="text" placeholder="Enter a new quote" required />
+    <input id="newQuoteCategory" type="text" placeholder="Enter quote category" required />
+    <button type="submit">Add Quote</button>
+  </form>
+
+  <script>
+    const quotes = [
+      { text: "The best way to predict the future is to create it.", category: "Motivation" },
+      { text: "Life is 10% what happens to us and 90% how we react to it.", category: "Inspiration" },
+      { text: "Your time is limited, so don’t waste it living someone else’s life.", category: "Life" }
+    ];
+
+    const quoteDisplay = document.getElementById('quoteDisplay');
+    const newQuoteButton = document.getElementById('newQuote');
+    const addQuoteForm = document.getElementById('addQuoteForm');
+    const newQuoteText = document.getElementById('newQuoteText');
+    const newQuoteCategory = document.getElementById('newQuoteCategory');
+
+    function showRandomQuote() {
+      const randomIndex = Math.floor(Math.random() * quotes.length);
+      const randomQuote = quotes[randomIndex];
+      quoteDisplay.textContent = `"${randomQuote.text}" - ${randomQuote.category}`;
+    }
+
+    function addQuote(event) {
+      event.preventDefault(); // Prevent form submission from reloading the page
+
+      const quoteText = newQuoteText.value.trim();
+      const quoteCategory = newQuoteCategory.value.trim();
+
+      if (quoteText && quoteCategory) {
+        quotes.push({ text: quoteText, category: quoteCategory });
+        newQuoteText.value = ""; // Clear the input fields
+        newQuoteCategory.value = "";
+        alert('New quote added successfully!');
+      } else {
+        alert('Please fill out both fields.');
+      }
+    }
+
+    newQuoteButton.addEventListener('click', showRandomQuote);
+    addQuoteForm.addEventListener('submit', addQuote);
+  </script>
+</body>
+</html>
