@@ -46,6 +46,7 @@ document.getElementById("addQuoteButton").addEventListener("click", addQuote);
 document.addEventListener("DOMContentLoaded", () => {
     populateCategories();
     fetchQuotesFromServer();
+    setInterval(checkForNewQuotes, 60000); // Check for new quotes every 60 seconds
     const lastViewedQuote = JSON.parse(sessionStorage.getItem("lastViewedQuote"));
     if (lastViewedQuote) {
         document.getElementById("quoteDisplay").innerHTML = `<p>"${lastViewedQuote.text}"</p><p><em>Category: ${lastViewedQuote.category}</em></p>`;
@@ -83,51 +84,11 @@ function filterQuote() {
 
 document.getElementById("categoryFilter").addEventListener("change", filterQuote);
 
-function exportToJsonFile() {
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(quotes));
-    const downloadAnchor = document.createElement("a");
-    downloadAnchor.setAttribute("href", dataStr);
-    downloadAnchor.setAttribute("download", "quotes.json");
-    document.body.appendChild(downloadAnchor);
-    downloadAnchor.click();
-    document.body.removeChild(downloadAnchor);
-}
-
-document.getElementById("exportQuotes").addEventListener("click", exportToJsonFile);
-
-function importFromJsonFile(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        try {
-            const importedQuotes = JSON.parse(e.target.result);
-            if (Array.isArray(importedQuotes)) {
-                quotes.push(...importedQuotes);
-                saveQuotesToLocalStorage();
-                populateCategories();
-                alert("Quotes imported successfully!");
-                showRandomQuote();
-            } else {
-                alert("Invalid file format.");
-            }
-        } catch (error) {
-            alert("Error reading file.");
-        }
-    };
-    reader.readAsText(file);
-}
-
-document.getElementById("importQuotes").addEventListener("change", importFromJsonFile);
-
 async function fetchQuotesFromServer() {
     try {
         const response = await fetch("https://mockapi.io/quotes"); // Replace with actual API endpoint
         const serverQuotes = await response.json();
-        quotes.push(...serverQuotes);
-        saveQuotesToLocalStorage();
-        populateCategories();
+        updateLocalQuotesWithServerData(serverQuotes);
     } catch (error) {
         console.error("Error fetching quotes from server:", error);
     }
@@ -147,3 +108,28 @@ async function syncQuotes() {
 }
 
 document.getElementById("syncQuotes").addEventListener("click", syncQuotes);
+
+async function checkForNewQuotes() {
+    try {
+        const response = await fetch("https://mockapi.io/quotes"); // Replace with actual API endpoint
+        const serverQuotes = await response.json();
+        updateLocalQuotesWithServerData(serverQuotes);
+    } catch (error) {
+        console.error("Error checking for new quotes:", error);
+    }
+}
+
+function updateLocalQuotesWithServerData(serverQuotes) {
+    let updated = false;
+    serverQuotes.forEach(serverQuote => {
+        if (!quotes.some(localQuote => localQuote.text === serverQuote.text)) {
+            quotes.push(serverQuote);
+            updated = true;
+        }
+    });
+    if (updated) {
+        saveQuotesToLocalStorage();
+        populateCategories();
+        alert("New quotes have been added from the server!");
+    }
+}
