@@ -45,6 +45,7 @@ document.getElementById("addQuoteButton").addEventListener("click", addQuote);
 
 document.addEventListener("DOMContentLoaded", () => {
     populateCategories();
+    fetchQuotesFromServer();
     const lastViewedQuote = JSON.parse(sessionStorage.getItem("lastViewedQuote"));
     if (lastViewedQuote) {
         document.getElementById("quoteDisplay").innerHTML = `<p>"${lastViewedQuote.text}"</p><p><em>Category: ${lastViewedQuote.category}</em></p>`;
@@ -119,3 +120,30 @@ function importFromJsonFile(event) {
 }
 
 document.getElementById("importQuotes").addEventListener("change", importFromJsonFile);
+
+async function fetchQuotesFromServer() {
+    try {
+        const response = await fetch("https://mockapi.io/quotes"); // Replace with actual API endpoint
+        const serverQuotes = await response.json();
+        quotes.push(...serverQuotes);
+        saveQuotesToLocalStorage();
+        populateCategories();
+    } catch (error) {
+        console.error("Error fetching quotes from server:", error);
+    }
+}
+
+async function syncQuotes() {
+    try {
+        await fetch("https://mockapi.io/quotes", { // Replace with actual API endpoint
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(quotes)
+        });
+        alert("Quotes synced successfully with server!");
+    } catch (error) {
+        console.error("Error syncing quotes:", error);
+    }
+}
+
+document.getElementById("syncQuotes").addEventListener("click", syncQuotes);
