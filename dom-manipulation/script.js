@@ -30,6 +30,22 @@ function addQuote() {
     document.getElementById("newQuoteText").value = "";
     document.getElementById("newQuoteCategory").value = "";
     alert("Quote added successfully!");
+    
+    // Update the displayed quote after adding a new one
+    showRandomQuote();
 }
 
-document.addEventListener("DOMContentLoaded", showRandomQuote);
+document.getElementById("newQuote").addEventListener("click", () => {
+    console.log("Show New Quote button clicked");
+    showRandomQuote();
+});
+
+document.getElementById("addQuoteButton").addEventListener("click", () => {
+    console.log("Add Quote button clicked");
+    addQuote();
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+    console.log("Document loaded, showing initial quote");
+    showRandomQuote();
+});
